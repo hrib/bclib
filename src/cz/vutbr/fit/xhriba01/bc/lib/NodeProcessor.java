@@ -84,7 +84,7 @@ public class NodeProcessor {
 	 * 
 	 * @return visitor
 	 */
-	public void _process() {
+	private void _process() {
 		
 		Node rootNode = fRoot;
 		

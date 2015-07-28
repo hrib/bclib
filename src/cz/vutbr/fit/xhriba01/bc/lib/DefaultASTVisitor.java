@@ -107,9 +107,9 @@ public class DefaultASTVisitor extends ASTVisitor {
 		
 		protected ASTNode fAstNode;
 		
-		protected int fLine = -1;
+		protected int fLine = Utils.INVALID_LINE;
 		
-		protected int fOffset = -1;
+		protected int fOffset = Utils.INVALID_OFFSET;
 		
 		public ASTNode getAstNode() {
 			return fAstNode;
@@ -305,6 +305,10 @@ public class DefaultASTVisitor extends ASTVisitor {
 			
 		}
 		
+		public TYPE getType() {
+			return fType;
+		}
+		
 		@Override
 		public void setAstNode(ASTNode node) {
 			super.setAstNode(node);
@@ -337,7 +341,7 @@ public class DefaultASTVisitor extends ASTVisitor {
 				fOffset = ((AnnotationTypeDeclaration) node).getName().getStartPosition();
 			}
 			
-			if (fOffset != -1) {
+			if (fOffset != Utils.INVALID_OFFSET) {
 				fLine = ((CompilationUnit) node.getRoot()).getLineNumber(fOffset);
 			}
 		}

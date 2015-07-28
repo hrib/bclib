@@ -8,6 +8,8 @@ import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InnerClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import cz.vutbr.fit.xhriba01.bc.lib.DefaultASTVisitor.ClassContext;
+
 public class NodeClass extends Node {
 	
 	private ClassNode fAsmClassNode;
@@ -99,6 +101,11 @@ public class NodeClass extends Node {
 		
 		return null;
 		
+	}
+	
+	public void setFromClassContext(ClassContext classContext) {
+		this.setSourceOffset(classContext.getOffset());
+		this.setSourceLine(classContext.getLine());
 	}
 	
 }

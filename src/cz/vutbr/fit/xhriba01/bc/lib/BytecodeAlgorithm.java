@@ -45,7 +45,7 @@ public final class BytecodeAlgorithm extends DefaultASTVisitor {
 	
 	private IClassContainer fClassContainer;
 	
-	private IFile2 fJavaFile;
+	private IFile fJavaFile;
 	
 	private Map<String, Object> fOptions;
 	
@@ -65,7 +65,7 @@ public final class BytecodeAlgorithm extends DefaultASTVisitor {
 		fOptions = options;
 	}
 	
-	public static Result run(IFile2 javaFile, IClassContainer classContainer, Map<String, Object> options) {
+	public static Result run(IFile javaFile, IClassContainer classContainer, Map<String, Object> options) {
 		
 		BytecodeAlgorithm algo = new BytecodeAlgorithm();
 		
@@ -216,7 +216,9 @@ public final class BytecodeAlgorithm extends DefaultASTVisitor {
 	@Override 
 	protected void onContextDeactivated(Context context) {
 		
-		
+		if (context.isClassContext()) {
+			
+		}
 	}
 	
 	private void setNodeClass(ClassContext classContext) {
@@ -225,7 +227,7 @@ public final class BytecodeAlgorithm extends DefaultASTVisitor {
 		
 		String filename = binaryName.getClassName() + ".class";
 		
-		IFile2 classFile = fClassContainer.getClassFile(filename);
+		IFile classFile = fClassContainer.getClassFile(filename);
 		
 		if (classFile == null) {
 			// unable to find .class file in class container
@@ -241,36 +243,61 @@ public final class BytecodeAlgorithm extends DefaultASTVisitor {
 		
 		NodeClass nodeClass = new NodeClass(classNode);
 		
-		classContext.setUserObject(nodeClass);
-		
 		// now set Node* parent (parent Node should be in parent Context as user object)
 		Context parentContext = classContext.getParent();
 		
-		if (parentContext != null) {
-			
-			Node parentNode = (Node) parentContext.getUserObject();
-			
-			if (parentNode != null) {
-				
-				parentNode.add(nodeClass);
+		//if (parentContext != null) {
+		
+		ClassContext parentClassContext = classContext.findParentContext(ClassContext.class);
+		
+		if (parentClassContext != null) {
+			// class is somewhere in other class, needs to validate inner classes
+			NodeClass parentNodeClass = (NodeClass) parentClassContext.getUserObject();
+			InnerClassNode innerClassNode = parentNodeClass.getUnusedInnerClass(classNode.name);
+			if (innerClassNode == null) {
+				// parent class does not have this inner class
+				return;
 			}
+			parentNodeClass.setAsUsed(innerClassNode);
 		}
+		
+		Node parentNode = (Node) parentContext.getUserObject();
+		parentNode.prepend(nodeClass);
+		
+		nodeClass.setFromClassContext(classContext);
+		
+		classContext.setUserObject(nodeClass);
+		
+		
+		//Node parentNode = (Node) parentContext.getUserObject();
+			
+			//if (parentNode != null) {
+				
+		//parentNode.add(nodeClass);
+			//}
+		//}
 		
 	}
 	
 	private void setNodeField(FieldContext fieldContext) {
 		
+		
 		NodeClass nodeClass = (NodeClass) fieldContext.getClassContext().getUserObject();
 		
+		/*
 		if (nodeClass == null) {
 			return;
 		}
+		*/
 		
 		NodeField nodeField = nodeClass.getUnusedNodeField(fieldContext.getName());
 		
 		if (nodeField == null) {
+			// no field with this name found
 			return;
 		}
+		
+		nodeField.setFromFieldContext(fieldContext);
 		
 		nodeClass.setAsUsed(nodeField);
 		
@@ -282,10 +309,6 @@ public final class BytecodeAlgorithm extends DefaultASTVisitor {
 		ClassContext classContext = methodContext.findParentContext(ClassContext.class);
 		
 		NodeClass nodeClass = (NodeClass) classContext.getUserObject();
-		
-		if (nodeClass == null) {
-			return;
-		}
 		
 		List<NodeMethod> sameNameMethods = new ArrayList<NodeMethod>();
  		
@@ -311,12 +334,37 @@ public final class BytecodeAlgorithm extends DefaultASTVisitor {
 		if (sameNameMethods.isEmpty()) {
 			return;
 		}
-
-		BinaryNameResolver resolver =  new BinaryNameResolver(fClassCollector.getContext(classContext), fClassCollector.getImports());
 		
-		MethodDescriptor maybeNonExactDesc = MethodDescriptor.fromMethodDeclaration(methodContext.getMethodDeclaration(), resolver);
+		/*
+		if (sameNameMethods.size() != 1) {
+			// more methods with same name
+			return;
+		}
+		*/
 		
-		for (NodeMethod nodeMethod : sameNameMethods) {
+		NodeMethod nodeMethod = sameNameMethods.get(0);
+		
+		methodContext.setUserObject(nodeMethod);
+		
+		nodeClass.setAsUsed(nodeMethod);
+		
+		if (sameNameMethods.size() == 1) {
+			for (Node check : nodeClass) {
+				if (check.isMethod()) {
+					if (((NodeMethod) check).getAsmMethodNode().name.equals(nodeMethod.getAsmMethodNode().name)) {
+						return;
+					}
+				}
+			}
+			// currently set line only if there is only one method 
+			nodeMethod.setFromMethodContext(methodContext);
+		}
+		
+		//BinaryNameResolver resolver =  new BinaryNameResolver(fClassCollector.getContext(classContext), fClassCollector.getImports());
+		
+		//MethodDescriptor maybeNonExactDesc = MethodDescriptor.fromMethodDeclaration(methodContext.getMethodDeclaration(), resolver);
+		
+		//for (NodeMethod nodeMethod : sameNameMethods) {
 			
 			/*
 			MethodNode methodNode = nodeMethod.getAsmMethodNode();
@@ -327,15 +375,15 @@ public final class BytecodeAlgorithm extends DefaultASTVisitor {
 			
 			if (matchValue == 0) {
 			*/
-				methodContext.setUserObject(nodeMethod);
-				nodeClass.setAsUsed(nodeMethod);
+				//methodContext.setUserObject(nodeMethod);
+				//nodeClass.setAsUsed(nodeMethod);
 			//}
 			
-		}
+		//}
 		
 	}
 	
-	private ClassNode createClassNode(IFile2 classFile) {
+	private ClassNode createClassNode(IFile classFile) {
 		
 		ClassReader classReader = null;
 		

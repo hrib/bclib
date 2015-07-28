@@ -13,19 +13,19 @@ public abstract class Node extends Tree<Node> implements Comparator<Node> {
 		ROOT,
 	}
 	
-	private int fStartLine = -1;
+	private int fStartLine = Utils.INVALID_LINE;
 	
-	private int fSourceOffset = -1;
+	private int fSourceOffset = Utils.INVALID_OFFSET;
 	
 	protected TYPE fType;
 	
 	public AnnotationMessages fAnnotationMessages = new AnnotationMessages();
 	
-	public int getStartLine() {
+	public int getSourceLine() {
 		return fStartLine;
 	}
 	
-	public void setStartLine(int startLine) {
+	public void setSourceLine(int startLine) {
 		fStartLine = startLine;
 	}
 	
@@ -48,8 +48,8 @@ public abstract class Node extends Tree<Node> implements Comparator<Node> {
 	@Override
 	public int compare(Node arg0, Node arg1) {
 		
-		int arg0Line = arg0.getStartLine();
-		int arg1Line = arg1.getStartLine();
+		int arg0Line = arg0.getSourceLine();
+		int arg1Line = arg1.getSourceLine();
 		
 		if (arg0Line == -1 && arg0Line == -1) {
 			return 0;

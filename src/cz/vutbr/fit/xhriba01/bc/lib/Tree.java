@@ -17,4 +17,9 @@ public class Tree<T extends Tree<T>> extends Container<T>  {
 		child.setParent((T)this);
 	}
 	
+	public void prepend(T child) {
+		super.prepend(child);
+		child.setParent((T)this);
+	}
+	
 }

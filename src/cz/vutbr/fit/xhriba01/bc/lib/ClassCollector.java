@@ -35,8 +35,6 @@ public class ClassCollector extends DefaultASTVisitor {
 	
 	public boolean visit(ImportDeclaration node) {
 		super.visit(node);
-		
-		
 		return true;
 	}
 	

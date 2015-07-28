@@ -3,7 +3,7 @@ package cz.vutbr.fit.xhriba01.bc.lib;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-public class ByteFile implements IFile2 {
+public class ByteFile implements IFile {
 	
 	private byte[] fBytes;
 	

@@ -25,6 +25,9 @@ import org.objectweb.asm.Opcodes;
  */
 public class Utils {
 	
+	public static int INVALID_LINE = Integer.MAX_VALUE;
+	public static int INVALID_OFFSET = Integer.MIN_VALUE;
+	
 	public static byte[] inputStreamToBytes(InputStream stream) {
 		
 		try {

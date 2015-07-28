@@ -14,6 +14,8 @@ import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TryCatchBlockNode;
 
+import cz.vutbr.fit.xhriba01.bc.lib.DefaultASTVisitor.MethodContext;
+
 public class NodeMethod extends Node {
 	
 	private MethodNode fAsmMethodNode;
@@ -59,7 +61,7 @@ public class NodeMethod extends Node {
 			
 			NodeInstruction nodeInstruction = new NodeInstruction(insnNode);
 			
-			nodeInstruction.setStartLine(currentLine);
+			nodeInstruction.setSourceLine(currentLine);
 			
 			this.add(nodeInstruction);
 		}
@@ -116,4 +118,8 @@ public class NodeMethod extends Node {
 		return ((fAsmMethodNode.access & Opcodes.ACC_STATIC) != 0);
 	}
 	
+	public void setFromMethodContext(MethodContext context) {
+		this.setSourceLine(context.getLine());
+		this.setSourceOffset(context.getOffset());
+	}
 }
