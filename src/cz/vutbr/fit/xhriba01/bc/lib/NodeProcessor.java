@@ -102,7 +102,26 @@ public class NodeProcessor {
 				
 				currentNode = ((AfterVisitNode) currentNode).fNode;
 				after = true;
-					
+				
+				if (currentNode.getType() == Node.TYPE.CLASS) {
+					NodeClass nodeClass = ((NodeClass) currentNode);
+					if (nodeClass.hasUnuseds()) {
+						
+						fNodes.push(new AfterVisitNode(currentNode));
+						
+						for(NodeMethod unusedMethod : nodeClass.getUnusedMethods()) {
+							fNodes.push(unusedMethod);
+						}
+						
+						for(NodeField unusedField : nodeClass.getUnusedFields()) {
+							fNodes.push(unusedField);
+						}
+						
+						nodeClass.cleanUnuseds(true);
+						continue;
+					}
+				}
+				
 				if (currentNode.getType() != Node.TYPE.INSTRUCTION || currentNode.hasChilds()) {
 						
 					fVisitor.removeActiveContext();

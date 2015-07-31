@@ -51,7 +51,7 @@ public abstract class Node extends Tree<Node> implements Comparator<Node> {
 		int arg0Line = arg0.getSourceLine();
 		int arg1Line = arg1.getSourceLine();
 		
-		if (arg0Line == -1 && arg0Line == -1) {
+		if (arg0Line == Utils.INVALID_LINE && arg0Line == Utils.INVALID_LINE) {
 			return 0;
 		}
 		

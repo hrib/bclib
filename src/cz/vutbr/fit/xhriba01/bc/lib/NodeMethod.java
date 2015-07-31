@@ -9,10 +9,12 @@ import java.util.Map;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TryCatchBlockNode;
+import org.objectweb.asm.util.Printer;
 
 import cz.vutbr.fit.xhriba01.bc.lib.DefaultASTVisitor.MethodContext;
 
@@ -50,9 +52,14 @@ public class NodeMethod extends Node {
 		
 		int currentLine = -1;
 		
+		System.out.println("START METODY");
+		
 		for (Iterator<AbstractInsnNode> it = fAsmMethodNode.instructions.iterator() ; it.hasNext(); ) {
 			
 			AbstractInsnNode insnNode = it.next();
+			
+			if (insnNode.getOpcode() != -1)
+			System.out.println(Printer.OPCODES[insnNode.getOpcode()]);
 			
 			if (insnNode.getType() == AbstractInsnNode.LINE) {
 				
@@ -61,7 +68,9 @@ public class NodeMethod extends Node {
 			
 			NodeInstruction nodeInstruction = new NodeInstruction(insnNode);
 			
-			nodeInstruction.setSourceLine(currentLine);
+			if (insnNode.getType() != AbstractInsnNode.LABEL) {
+				nodeInstruction.setSourceLine(currentLine);
+			}
 			
 			this.add(nodeInstruction);
 		}
@@ -121,5 +130,12 @@ public class NodeMethod extends Node {
 	public void setFromMethodContext(MethodContext context) {
 		this.setSourceLine(context.getLine());
 		this.setSourceOffset(context.getOffset());
+	}
+	
+	@Override
+	public void sort() {
+		
+		return;
+		
 	}
 }

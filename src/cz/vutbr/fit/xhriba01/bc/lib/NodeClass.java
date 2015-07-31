@@ -25,12 +25,12 @@ public class NodeClass extends Node {
 		fAsmClassNode = asmClassNode;
 		fType = TYPE.CLASS;
 		
-		for(MethodNode methodNode : fAsmClassNode.methods) {
-			this.fUnusedMethods.add(new NodeMethod(methodNode));
-		}
-		
 		for(FieldNode fieldNode : fAsmClassNode.fields) {
 			this.fUnusedFields.add(new NodeField(fieldNode));
+		}
+		
+		for(MethodNode methodNode : fAsmClassNode.methods) {
+			this.fUnusedMethods.add(new NodeMethod(methodNode));
 		}
 		
 		for(InnerClassNode innerClass : fAsmClassNode.innerClasses) {
@@ -43,6 +43,23 @@ public class NodeClass extends Node {
 			
 		}
 		
+	}
+	
+	public boolean hasUnuseds() {
+		return (fUnusedFields.size() > 0) || (fUnusedMethods.size() > 0);
+	}
+	
+	public void cleanUnuseds(boolean addAsChilds) {
+		if (addAsChilds) {
+			for (NodeField field : fUnusedFields) {
+				add(field);
+			}
+			for (NodeMethod method : fUnusedMethods) {
+				add(method);
+			}
+		}
+		fUnusedFields.clear();
+		fUnusedMethods.clear();
 	}
 	
 	public ClassNode getAsmClassNode() {
@@ -62,6 +79,10 @@ public class NodeClass extends Node {
 	
 	public List<NodeMethod> getUnusedMethods() {
 		return fUnusedMethods;
+	}
+	
+	public List<NodeField> getUnusedFields() {
+		return fUnusedFields;
 	}
 	
 	public List<InnerClassNode> getUnusedInnerClasses() {

@@ -115,8 +115,10 @@ public class DescriptorPart {
 		if (elementType.getSort() == org.objectweb.asm.Type.OBJECT) {
 			setFromAsmObjectType(elementType);
 			fType = TYPE.ARRAY_OBJECT;
-			fName = fName.substring(fDimensions+1, fName.length());  // asm vraci pro pole tu formu [Ljava/lang/Object;
-			fName = fName.substring(0, fName.length()-1);
+			if (fName.startsWith("[")) {
+				fName = fName.substring(fDimensions+1, fName.length());  // asm vraci pro pole tu formu [Ljava/lang/Object;
+				fName = fName.substring(0, fName.length()-1);
+			}
 		}
 		else {
 			setFromAsmPrimitiveType(elementType);
@@ -129,6 +131,8 @@ public class DescriptorPart {
 		fType = TYPE.OBJECT;
 		
 		fName = type.getInternalName();
+		//fName = fName.substring(0, fName.length()-1);
+		//fName = fName.substring(1, fName.length());
 		
 	}
 	
