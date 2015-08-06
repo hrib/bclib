@@ -7,7 +7,7 @@ Bundle-Vendor: Jaromír Hřibal
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.eclipse.jdt.core,
  org.eclipse.core.runtime,
- asm
+ asmlib
 Bundle-ActivationPolicy: lazy
 Export-Package: cz.vutbr.fit.xhriba01.bc.lib;uses:="org.eclipse.jdt.core.dom,org.objectweb.asm,org.objectweb.asm.tree"
 Bundle-ClassPath: .,

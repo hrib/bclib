@@ -1,0 +1,12 @@
+apply plugin: 'java'
+
+dependencies {
+  compile group: 'commons-io',  name: 'commons-io', version: '2.4'
+}
+
+repositories { mavenCentral() }
+
+task getDeps(type: Copy) {
+  from sourceSets.main.compileClasspath
+  into 'lib'
+}
